@@ -1,9 +1,13 @@
 close all;
 clear all;
 clc;
+addpath('/home/gisphd/mexopencv');
+addpath('/home/gisphd/mexopencv/opencv_contrib');
 
 addpath data
 addpath lib
+addpath data/AirCraftMotion
+
 
 PosLat = 32 + 51/60   %北纬 32度51分
 PosLon = 103 + 41/60 % 东经103度41分
