@@ -5,16 +5,16 @@ clc;
 addpath data
 addpath lib
 
-PosLat = 32 + 51/60   %ï¿½ï¿½Î³ 32ï¿½ï¿½51ï¿½ï¿½
-PosLon = 103 + 41/60 % ï¿½ï¿½ï¿½ï¿½103ï¿½ï¿½41ï¿½ï¿½
+PosLat = 32 + 51/60   %Ã¯Â¿Â½Ã¯Â¿Â½ÃŽÂ³ 32Ã¯Â¿Â½Ã¯Â¿Â½51Ã¯Â¿Â½Ã¯Â¿Â½
+PosLon = 103 + 41/60 % Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½103Ã¯Â¿Â½Ã¯Â¿Â½41Ã¯Â¿Â½Ã¯Â¿Â½
 
 airportZeroLat = 12.03/(60 * 60)
 airportZeroLon = -5.01/(60*60)
-airportZeroHight = 3448 %ï¿½ï¿½Îªï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½È¥23ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+airportZeroHight = 3448 %Ã¯Â¿Â½Ã¯Â¿Â½ÃŽÂªÃ¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃŸÂ£Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃˆÂ¥23Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½
 
 cameraPosLat = 24.41/(60 * 60)
 cameraPosLon = 13.35/(60*60)
-cameraPosHight = 3473 %ï¿½ï¿½Îªï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½È¥23ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+cameraPosHight = 3473 %Ã¯Â¿Â½Ã¯Â¿Â½ÃŽÂªÃ¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃŸÂ£Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃˆÂ¥23Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½
 
 w1PosLat = 13.67/(60 * 60)
 w1PosLon = -0.19/(60*60)
@@ -65,7 +65,7 @@ poswtLon = wtPosLon + PosLon
 [xwt,ywt,utmzonewt,utmhemiwt] = wgs2utm(poswtLat,poswtLon)
 
 
-% posXY,ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½
+% posXY,Ã¯Â¿Â½Ã”Â»Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃŽÂªÃ¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã„Â»Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½ÃÂµÃ¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½Ã¯Â¿Â½
 posXYZ = [x1-x0,y1-y0,posWgs(:,3)-airportZeroHight]
 
 posCameraXYZ = [xc-x0,-(yc-y0),cameraPosHight-airportZeroHight]
@@ -81,7 +81,14 @@ subdist = pdist/(36-1)
 [wxx,wyy]=fillline([xw1-x0 yw1-y0],[xwt-x0 ywt-y0],36-1)
 
 wzz =  repmat(wtPosHight-airportZeroHight,size(wxx'),1)
-wxxyy = [wxx' wyy' wzz];
+
+
+
+
+[ixx,iyy]=fillline([929 357],[323 404],35)
+ixxyy = [round(ixx') round(iyy')];
+
+wxxyy = [wxx' wyy' wzz ixxyy];
+%csvwrite('craftimgtracks.csv',ixxyy);
 
 csvwrite('crafttracks.csv',wxxyy);
-

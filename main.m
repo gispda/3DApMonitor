@@ -56,6 +56,15 @@ posXYZ = [x1-x0,y1-y0,posWgs(:,3)-airportZeroHight];
 
 posCameraXYZ = [xc-x0,-(yc-y0),cameraPosHight-airportZeroHight];
 
+
+ crafttracks = csvread('crafttracks.csv');
+ 
+ %M = estimateCameraPMatrix(posImg,posXYZ)
+
+ posXYZ = [posXYZ;crafttracks(:,1:3)];
+ 
+ posImg = [posImg;crafttracks(:,4:5)];
+ 
 M = estimateCameraProjectionMatrix(posImg,posXYZ)
  
 %t = posCameraXYZ'
@@ -63,6 +72,7 @@ M = estimateCameraProjectionMatrix(posImg,posXYZ)
 
 wxy = csvread('data/AirCraftMotion/crafttracks.csv')
 cap = cv.VideoCapture('data/AirCraftMotion/aircraft.avi');
+craftimg = estimatepoints2D(wxy(:,1:3),K,R,t)
 
 pause(2); % Necessary in some environment. See help cv.VideoCapture
 assert(cap.isOpened(), 'Camera failed to initialized');
@@ -113,7 +123,7 @@ frameidx = 1;
    %wxy(frameidx,2);
     
     %craftpos = [wxy(frameidx) ]
-    craftimgpos = estimatepoints2D(wxy(frameidx,:),K,R,t)
+    craftimgpos = estimatepoints2D(wxy(frameidx,1:3),K,R,t)
 
 
 

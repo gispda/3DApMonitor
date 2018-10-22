@@ -5,16 +5,16 @@ clc;
 addpath data
 addpath lib
 
-PosLat = 32 + 51/60   %±±Î³ 32¶È51·Ö
-PosLon = 103 + 41/60 % ¶«¾­103¶È41·Ö
+PosLat = 32 + 51/60   %ï¿½ï¿½Î³ 32ï¿½ï¿½51ï¿½ï¿½
+PosLon = 103 + 41/60 % ï¿½ï¿½ï¿½ï¿½103ï¿½ï¿½41ï¿½ï¿½
 
 airportZeroLat = 12.03/(60 * 60)
 airportZeroLon = -5.01/(60*60)
-airportZeroHight = 3448 %ÒòÎªÁãµã¸ß£¬¶à¼õÈ¥23£¬·½±ã¼ÆËã
+airportZeroHight = 3448 %ï¿½ï¿½Îªï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½È¥23ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 cameraPosLat = 24.41/(60 * 60)
 cameraPosLon = 13.35/(60*60)
-cameraPosHight = 3473 %ÒòÎªÁãµã¸ß£¬¶à¼õÈ¥23£¬·½±ã¼ÆËã
+cameraPosHight = 3473 %ï¿½ï¿½Îªï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½È¥23ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 w1PosLat = 13.67/(60 * 60)
 w1PosLon = -0.19/(60*60)
@@ -63,17 +63,21 @@ poswtLon = wtPosLon + PosLon
 [xc,yc,utmzonec,utmhemic] = wgs2utm(poscameraLat,poscameraLon)
 
 
-% posXY,ÒÔ»ú³¡ÁãµãÎª×ø±êµÄ»ú³¡×ø±êÏµ×ø±ê
+% posXY,ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½
 posXYZ = [x1-x0,y1-y0,posWgs(:,3)-airportZeroHight]
 
 posCameraXYZ = [xc-x0,-(yc-y0),cameraPosHight-airportZeroHight]
 
 
 
-
+ crafttracks = csvread('crafttracks.csv');
+ 
  %M = estimateCameraPMatrix(posImg,posXYZ)
 
-
+ posXYZ = [posXYZ;crafttracks(:,1:3)];
+ 
+ posImg = [posImg;crafttracks(:,4:5)];
+ 
  M = estimateCameraProjectionMatrix(posImg,posXYZ)
  
 %t = posCameraXYZ'
