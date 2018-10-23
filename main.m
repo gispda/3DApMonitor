@@ -6,6 +6,8 @@ addpath('/home/gisphd/mexopencv/opencv_contrib');
 
 addpath data
 addpath lib
+addpath matGeom
+addpath matGeom/polynomialCurves2d
 addpath data/AirCraftMotion
 addpath('/home/gisphd/project/AirCraftMotion')
 
