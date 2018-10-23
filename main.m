@@ -7,7 +7,7 @@ addpath('/home/gisphd/mexopencv/opencv_contrib');
 addpath data
 addpath lib
 addpath data/AirCraftMotion
-
+addpath('/home/gisphd/project/AirCraftMotion')
 
 PosLat = 32 + 51/60;   %北纬 32度51分
 PosLon = 103 + 41/60; % 东经103度41分
@@ -71,11 +71,11 @@ M = estimateCameraProjectionMatrix(posImg,posXYZ)
 [K,R,t] = estimate_KR_fromMT(M)
 
 wxy = csvread('data/AirCraftMotion/crafttracks.csv')
-cap = cv.VideoCapture('data/AirCraftMotion/aircraft.avi');
+%cap = cv.VideoCapture('data/AirCraftMotion/aircraft.avi');
 craftimg = estimatepoints2D(wxy(:,1:3),K,R,t)
 
-pause(2); % Necessary in some environment. See help cv.VideoCapture
-assert(cap.isOpened(), 'Camera failed to initialized');
+%pause(2); % Necessary in some environment. See help cv.VideoCapture
+%assert(cap.isOpened(), 'Camera failed to initialized');
 
 disp('開始飛機的三維重建.');
 
@@ -83,12 +83,17 @@ kernel = cv.getStructuringElement('Shape', 'Ellipse', 'KSize',[2,2]);
 fgbg = cv.BackgroundSubtractorMOG();
 stop = false;
 frameidx = 1;
- while ~stop   
-  frame = cap.read();
+posnum = size(wxy,1);
+for imgidx=100:999
+  fname=strcat('/home/gisphd/project/AirCraftMotion/','00000',num2str(imgidx),'.ppm');
+% while ~stop   
+ % frame = cap.read();
+ 
+  frame = imread(fname);
   %frame = cv.cvtColor(frame, 'BGR2GRAY');
-  if isempty(frame)
-  	stop = true;
-  else
+  %if isempty(frame)
+  %	stop = true;
+  %else
   frame = cv.resize(frame,[1080,768], 'Interpolation','Cubic');
   frame_motion = cv.copyTo(frame);
 
@@ -96,7 +101,7 @@ frameidx = 1;
    fgmask = fgbg.apply(frame_motion);
     opts = { 'Type','Binary','MaxValue',255};
     draw1 = cv.threshold(fgmask,'Otsu',opts{:});
-    draw1 = cv.dilate(draw1,'Element',kernel,'Iterations',1);
+    draw1 = cv.dilate(draw1,'Element',kernel,'Iterations',2);
     drawcpy = cv.copyTo(draw1);
     [contours, hierarchy] = cv.findContours(drawcpy, ...
         'Mode','External', 'Method','Simple');
@@ -123,6 +128,9 @@ frameidx = 1;
    %wxy(frameidx,2);
     
     %craftpos = [wxy(frameidx) ]
+    tempidx = mod(imgidx-100,25);
+    
+    if (tempidx == 0) && (frameidx <= posnum)
     craftimgpos = estimatepoints2D(wxy(frameidx,1:3),K,R,t);
 
     
@@ -151,9 +159,11 @@ frameidx = 1;
      dmin(1,1)
     
      if dmin(1,1)>0
-      for i=1:12   
-      %for i=1:size(dmin,1)-18
-        dmin(i,2)=true;
+      %for i=1:12   
+      for i=1:size(dmin,1)
+        if dmin(i,1) < 99
+          dmin(i,2)=true;
+        end
       end
   
      end
@@ -175,10 +185,9 @@ frameidx = 1;
   %imshow(frame);
   frameidx = frameidx + 1;
  
-  
-  
-  end
+  end % end tempidx ==0 
+  end % end for imgidx = 100:1000
+ % end %end while ~stop
   
   
 
-end
