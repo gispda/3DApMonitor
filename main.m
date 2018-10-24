@@ -138,16 +138,25 @@ for imgidx=100:999
     
    
    drawing = zeros([size(draw1) 3], 'uint8');
-    
+
+    clear headp;
+
+   
     dmin = zeros(numel(contours),2);
     
     for i=1:numel(contours)
-       
-        polygonxy = celltoPointsMatrix(contours{i});
         
+        polygonxy = celltoPointsMatrix(contours{i});
+        headp.divpos = [-1 -1];
+        headp.headpos = [-1 -1];
+        headp.dmin = -1;
+        headp.view = false;
+    
+        headp(i).polygonxy = polygonxy; 
         
         if size(polygonxy,1)>=3 
         dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+          %[headp.divpos, headp.dmin(i,1)] = projPointOnPolygon(...)
         elseif size(polygonxy,1)==2 
         dmin(i,1)=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
         end
