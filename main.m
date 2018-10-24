@@ -156,8 +156,8 @@ for imgidx=100:999
         
         if size(polygonxy,1)>=3 
        % dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
-         headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
-          %[headp.divpos, headp.dmin(i,1)] = projPointOnPolygon(...)
+         %headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+          [headp.divpos, headp.dmin(i,1)] = projPointOnPolygon(craftimgpos,headp(i).polygonxy);
         elseif size(polygonxy,1)==2 
         headp(i).dmin=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
         end
