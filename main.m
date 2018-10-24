@@ -1,13 +1,14 @@
 close all;
 clear all;
 clc;
-addpath('/home/gisphd/mexopencv');
-addpath('/home/gisphd/mexopencv/opencv_contrib');
+addpath('/home/gisphd/project/mexopencv');
+addpath('/home/gisphd/project/mexopencv/opencv_contrib');
 
 addpath data
 addpath lib
 addpath matGeom
-addpath matGeom/polynomialCurves2d
+addpath matGeom/geom2d
+addpath matGeom/polygons2d
 addpath data/AirCraftMotion
 addpath('/home/gisphd/project/AirCraftMotion')
 
@@ -86,6 +87,17 @@ fgbg = cv.BackgroundSubtractorMOG();
 stop = false;
 frameidx = 1;
 posnum = size(wxy,1);
+
+aircraft.yaw = 0;
+aircraft.yoll= 0;
+aircraft.pitch=0;
+aircraft.x=0;
+aircraft.y=0;
+aircraft.z=0;% 高度方向
+aircraft.u=0;
+aircraft.v=0;
+
+
 for imgidx=100:999
   fname=strcat('/home/gisphd/project/AirCraftMotion/','00000',num2str(imgidx),'.ppm');
 % while ~stop   
@@ -134,59 +146,78 @@ for imgidx=100:999
     
     if (tempidx == 0) && (frameidx <= posnum)
     craftimgpos = estimatepoints2D(wxy(frameidx,1:3),K,R,t);
-
+    aircraft(frameidx).x=wxy(frameidx,1);
+    aircraft(frameidx).y=wxy(frameidx,2);
+    aircraft(frameidx).z=wxy(frameidx,3);
+    aircraft(frameidx).u=craftimgpos(:,1);
+    aircraft(frameidx).v=craftimgpos(:,2);
+    
+    
+    
     
    
    drawing = zeros([size(draw1) 3], 'uint8');
 
     clear headp;
 
-   
+    headp.divpos = -1;
+    headp.headpos = [-1 -1];
+    headp.dmin = 9999;
+    headp.view = false;
+    
     dmin = zeros(numel(contours),2);
     
     for i=1:numel(contours)
         
         polygonxy = celltoPointsMatrix(contours{i});
-        headp.divpos = [-1 -1];
-        headp.headpos = [-1 -1];
-        headp.dmin = -1;
-        headp.view = false;
+        headp(i).divpos = -1;
+        headp(i).headpos = [-1 -1];
+        headp(i).dmin = 9999;
+        headp(i).view = false;
     
         headp(i).polygonxy = polygonxy; 
         
         if size(polygonxy,1)>=3 
-        dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
-          %[headp.divpos, headp.dmin(i,1)] = projPointOnPolygon(...)
+       % dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+         %headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+          [headp(i).divpos, headp(i).dmin] = projPointOnPolygon(craftimgpos,headp(i).polygonxy);
         elseif size(polygonxy,1)==2 
-        dmin(i,1)=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
+        headp(i).dmin=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
         end
-        dmin(i,2)=false;
+
+        headp(i).view = false;
+        %dmin(i,2)=false;
         
        
     end
-   if ~isempty(dmin)
-     dmin = sort(dmin,1);
+   %if ~isempty(dmin)
+   if numel(contours) > 1
+     %dmin = sort(dmin,1);
+     clear nheadp;
+     [nheadp,nheadpidx] = sort([headp.dmin])
      craftimgpos
-     dmin(1,1)
+     %dmin(1,1)
     
-     if dmin(1,1)>0
+     %if dmin(1,1)>0
       %for i=1:12   
-      for i=1:size(dmin,1)
-        if dmin(i,1) < 99
-          dmin(i,2)=true;
+      for i=1:numel(headp)
+        if headp(i).dmin < 99 
+          headp(i).view=true;
         end
       end
   
-     end
+    % end
   end
   for i=1:numel(contours)
        
        
         clr = randi([0 255], [1 3], 'uint8');
-        if dmin(i,2)
-        drawing = cv.drawContours(drawing, contours, ...
+        if numel(headp) > 1
+          if headp(i).view
+            drawing = cv.drawContours(drawing, contours, ...
             'Hierarchy',hierarchy, 'ContourIdx',i-1, 'MaxLevel',0, ...
             'Color',clr, 'Thickness',2, 'LineType',8);
+          end
         end
     end
 
