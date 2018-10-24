@@ -208,10 +208,10 @@ for imgidx=100:999
   
     % end
   end
-  for i=1:numel(contours)
+  for i=1:numel(contours)      
        
-       
-        clr = randi([0 255], [1 3], 'uint8');
+       % clr = randi([0 255], [1 3], 'uint8');
+       clr = [0 255 0];
         if numel(headp) > 1
           if headp(i).view
             drawing = cv.drawContours(drawing, contours, ...
