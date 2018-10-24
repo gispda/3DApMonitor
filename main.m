@@ -138,43 +138,57 @@ for imgidx=100:999
     
    
    drawing = zeros([size(draw1) 3], 'uint8');
-    
+
+    clear headp;
+
+   
     dmin = zeros(numel(contours),2);
     
     for i=1:numel(contours)
-       
-        polygonxy = celltoPointsMatrix(contours{i});
         
+        polygonxy = celltoPointsMatrix(contours{i});
+        headp(i).divpos = [-1 -1];
+        headp(i).headpos = [-1 -1];
+        headp(i).dmin = 9999;
+        headp(i).view = false;
+    
+        headp(i).polygonxy = polygonxy; 
         
         if size(polygonxy,1)>=3 
-        dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+       % dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+         headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+          %[headp.divpos, headp.dmin(i,1)] = projPointOnPolygon(...)
         elseif size(polygonxy,1)==2 
-        dmin(i,1)=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
+        headp(i).dmin=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
         end
-        dmin(i,2)=false;
+
+        headp(i).view = false;
+        %dmin(i,2)=false;
         
        
     end
-   if ~isempty(dmin)
-     dmin = sort(dmin,1);
+   %if ~isempty(dmin)
+   if ~isempty(headp)
+     %dmin = sort(dmin,1);
+     [nheadp,nheadpidx] = sort([headp.dmin])
      craftimgpos
-     dmin(1,1)
+     %dmin(1,1)
     
-     if dmin(1,1)>0
+     %if dmin(1,1)>0
       %for i=1:12   
-      for i=1:size(dmin,1)
-        if dmin(i,1) < 99
-          dmin(i,2)=true;
+      for i=1:size(headp,1)
+        if headp(i).dmin < 99
+          headp(i).view=true;
         end
       end
   
-     end
+    % end
   end
   for i=1:numel(contours)
        
        
         clr = randi([0 255], [1 3], 'uint8');
-        if dmin(i,2)
+        if headp(i).view
         drawing = cv.drawContours(drawing, contours, ...
             'Hierarchy',hierarchy, 'ContourIdx',i-1, 'MaxLevel',0, ...
             'Color',clr, 'Thickness',2, 'LineType',8);
