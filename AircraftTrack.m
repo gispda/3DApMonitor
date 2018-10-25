@@ -121,6 +121,9 @@ classdef AircraftTrack
            
         aircraftavline = createLine([at.Au at.Av],[preat.Au preat.Av]);
         aircrafthvline = parallelLine(aircraftavline, [preat.Hu preat.Hv]);
+        aircraftprehaline = createLine([preat.Au preat.Av],[preat.Hu preat.Hv]);
+        aircraftathaline = parallelLine(aircraftprehaline, [at.Hu at.Hv]);
+        headpointl = intersectLines(aircraftathaline, aircrafthvline);
         for i=1:3
             pg = headp(nheadpidx(i)).polygonxy;
             [headpoint, edgeidx] = intersectLinePolyline(aircrafthvline, pg);
