@@ -88,31 +88,26 @@ stop = false;
 frameidx = 1;
 posnum = size(wxy,1);
 
-aircraft.yaw = 0;
-aircraft.yoll= 0;
-aircraft.pitch=0;
-aircraft.x=0;
-aircraft.y=0;
-aircraft.z=0;% 高度方向
-aircraft.u=0;
-aircraft.v=0;
 
+
+
+aircrafttrack(1,posnum) = AircraftTrack();
 
 for imgidx=100:999
   fname=strcat('/home/gisphd/project/AirCraftMotion/','00000',num2str(imgidx),'.ppm');
-% while ~stop   
- % frame = cap.read();
+    % while ~stop   
+    % frame = cap.read();
  
-  frame = imread(fname);
-  %frame = cv.cvtColor(frame, 'BGR2GRAY');
-  %if isempty(frame)
-  %	stop = true;
-  %else
-  frame = cv.resize(frame,[1080,768], 'Interpolation','Cubic');
-  frame_motion = cv.copyTo(frame);
+    frame = imread(fname);
+    %frame = cv.cvtColor(frame, 'BGR2GRAY');
+    %if isempty(frame)
+   %	stop = true;
+     %else
+    frame = cv.resize(frame,[1080,768], 'Interpolation','Cubic');
+    frame_motion = cv.copyTo(frame);
 
-%计算前景掩码
-   fgmask = fgbg.apply(frame_motion);
+    %计算前景掩码
+    fgmask = fgbg.apply(frame_motion);
     opts = { 'Type','Binary','MaxValue',255};
     draw1 = cv.threshold(fgmask,'Otsu',opts{:});
     draw1 = cv.dilate(draw1,'Element',kernel,'Iterations',2);
@@ -133,103 +128,101 @@ for imgidx=100:999
     [center{i}, radius(i)] = cv.minEnclosingCircle(contours{i});
     end
 
-%% Draw
-% Draw polygonal contour + bonding rects + circles
+    %% Draw
+    % Draw polygonal contour + bonding rects + circles
 
-%%% 計算得到飛機的坐標信息，反算到圖像坐標系，準備計算得到飛機機頭的圖像坐標系的圖像坐標，從而能夠得到質心坐標
-   %wxy(frameidx,:);
-   %wxy(frameidx,1);
-   %wxy(frameidx,2);
+    %%% 計算得到飛機的坐標信息，反算到圖像坐標系，準備計算得到飛機機頭的圖像坐標系的圖像坐標，從而能夠得到質心坐標
+    %wxy(frameidx,:);
+    %wxy(frameidx,1);
+    %wxy(frameidx,2);
     
     %craftpos = [wxy(frameidx) ]
     tempidx = mod(imgidx-100,25);
     
     if (tempidx == 0) && (frameidx <= posnum)
-    craftimgpos = estimatepoints2D(wxy(frameidx,1:3),K,R,t);
-    aircraft(frameidx).x=wxy(frameidx,1);
-    aircraft(frameidx).y=wxy(frameidx,2);
-    aircraft(frameidx).z=wxy(frameidx,3);
-    aircraft(frameidx).u=craftimgpos(:,1);
-    aircraft(frameidx).v=craftimgpos(:,2);
+      craftimgpos = estimatepoints2D(wxy(frameidx,1:3),K,R,t);
+      aircrafttrack(frameidx).AX = wxy(frameidx,1);
+      aircrafttrack(frameidx).AY = wxy(frameidx,2);
+      aircrafttrack(frameidx).AZ = wxy(frameidx,3);
+      aircrafttrack(frameidx).U = craftimgpos(:,1);
+      aircrafttrack(frameidx).V = craftimgpos(:,2);
     
-    
-    
-    
-   
-   drawing = zeros([size(draw1) 3], 'uint8');
+      
+            drawing = zeros([size(draw1) 3], 'uint8');
 
-    clear headp;
+            clear headp;
 
-    headp.divpos = -1;
-    headp.headpos = [-1 -1];
-    headp.dmin = 9999;
-    headp.view = false;
+            headp.divpos = -1;
+            headp.headpos = [-1 -1];
+            headp.dmin = 9999;
+            headp.view = false;
     
-    dmin = zeros(numel(contours),2);
+            dmin = zeros(numel(contours),2);
     
-    for i=1:numel(contours)
+            for i=1:numel(contours)
         
-        polygonxy = celltoPointsMatrix(contours{i});
-        headp(i).divpos = -1;
-        headp(i).headpos = [-1 -1];
-        headp(i).dmin = 9999;
-        headp(i).view = false;
+              polygonxy = celltoPointsMatrix(contours{i});
+              headp(i).divpos = -1;
+              headp(i).headpos = [-1 -1];
+              headp(i).dmin = 9999;
+              headp(i).view = false;
     
-        headp(i).polygonxy = polygonxy; 
+              headp(i).polygonxy = polygonxy; 
         
-        if size(polygonxy,1)>=3 
-       % dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
-         %headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
-          [headp(i).divpos, headp(i).dmin] = projPointOnPolygon(craftimgpos,headp(i).polygonxy);
-        elseif size(polygonxy,1)==2 
-        headp(i).dmin=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
-        end
+              if size(polygonxy,1)>=3 
+                % dmin(i,1)= p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+                %headp(i).dmin = p_poly_dist(craftimgpos(:,1), craftimgpos(:,2), polygonxy(:,1), polygonxy(:,2));        
+                [headp(i).divpos, headp(i).dmin] = projPointOnPolygon(craftimgpos,headp(i).polygonxy);
+              elseif size(polygonxy,1)==2 
+                headp(i).dmin=point_to_line_distance(craftimgpos, polygonxy(1,:), polygonxy(2,:));
+              end
 
-        headp(i).view = false;
-        %dmin(i,2)=false;
+              headp(i).view = false;
+              %dmin(i,2)=false;
         
        
-    end
-   %if ~isempty(dmin)
-   if numel(contours) > 1
-     %dmin = sort(dmin,1);
-     clear nheadp;
-     [nheadp,nheadpidx] = sort([headp.dmin])
-     craftimgpos
-     %dmin(1,1)
-    
-     %if dmin(1,1)>0
-      %for i=1:12   
-      for i=1:numel(headp)
-        if headp(i).dmin < 99 
-          headp(i).view=true;
-        end
-      end
-  
-    % end
-  end
-  for i=1:numel(contours)      
-       
-       % clr = randi([0 255], [1 3], 'uint8');
-       clr = [0 255 0];
-        if numel(headp) > 1
-          if headp(i).view
-            drawing = cv.drawContours(drawing, contours, ...
-            'Hierarchy',hierarchy, 'ContourIdx',i-1, 'MaxLevel',0, ...
-            'Color',clr, 'Thickness',2, 'LineType',8);
+            end % for i=1:numel(contours)
+
+          if numel(contours) > 1
+
+          clear nheadp;
+          [nheadp,nheadpidx] = sort([headp.dmin])
+          for i=1:numel(headp)
+            if headp(i).dmin < 99 
+            headp(i).view=true;
+            end
           end
-        end
-    end
+          end % if numel(contours) > 1
+          for i=1:numel(contours)      
+       
+          % clr = randi([0 255], [1 3], 'uint8');
+          clr = [0 255 0];
+            if numel(headp) > 1
+              if headp(i).view
+                  drawing = cv.drawContours(drawing, contours, ...
+                'Hierarchy',hierarchy, 'ContourIdx',i-1, 'MaxLevel',0, ...
+                'Color',clr, 'Thickness',2, 'LineType',8);
+              end
+            end
+          end % for i=1:numel(contours)  
 
-  %imshow(draw1);
+        %imshow(draw1);
 
-  imshow(drawing);  
-  %imshow(frame);
-  frameidx = frameidx + 1;
+        imshow(drawing);  
+        %imshow(frame);
+  %{
+   從第二個飛機點計算飛機的姿態三個角度
+  %}
+  if frameidx >1 
+      
+  bs = aircrafttrack(frameidx).calcHeadPos(aircrafttrack(frameidx-1),headp);
+  end    
+
+      frameidx = frameidx + 1;
  
-  end % end tempidx ==0 
-  end % end for imgidx = 100:1000
- % end %end while ~stop
+    end % end tempidx ==0 
+end % end for imgidx = 100:1000
+
   
   
 
