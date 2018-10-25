@@ -144,8 +144,8 @@ for imgidx=100:999
       aircrafttrack(frameidx).AX = wxy(frameidx,1);
       aircrafttrack(frameidx).AY = wxy(frameidx,2);
       aircrafttrack(frameidx).AZ = wxy(frameidx,3);
-      aircrafttrack(frameidx).U = craftimgpos(:,1);
-      aircrafttrack(frameidx).V = craftimgpos(:,2);
+      aircrafttrack(frameidx).Au = craftimgpos(:,1);
+      aircrafttrack(frameidx).Av = craftimgpos(:,2);
     
       
             drawing = zeros([size(draw1) 3], 'uint8');
@@ -185,8 +185,8 @@ for imgidx=100:999
 
           if numel(contours) > 1
 
-          clear nheadp;
-          [nheadp,nheadpidx] = sort([headp.dmin])
+          %clear nheadp;
+          %[nheadp,nheadpidx] = sort([headp.dmin])
           for i=1:numel(headp)
             if headp(i).dmin < 99 
             headp(i).view=true;
@@ -213,8 +213,12 @@ for imgidx=100:999
   %{
    從第二個飛機點計算飛機的姿態三個角度
   %}
-  if frameidx >1 
-      
+  if frameidx ==1
+    aircrafttrack(1).Hu=915;
+    aircrafttrack(1).Hv=376;
+
+
+  elseif frameidx>1    
   bs = aircrafttrack(frameidx).calcHeadPos(aircrafttrack(frameidx-1),headp);
   end    
 

@@ -12,8 +12,10 @@ classdef AircraftTrack
       OX
       OY
       OZ
-      U
-      V
+      Au
+      Av
+      Hu
+      Hv     
       MotionType
 
    end
@@ -34,8 +36,10 @@ classdef AircraftTrack
             at.OX = 0;
             at.OY = 0;
             at.OZ = 0;
-            at.U = 0;
-            at.V = 0;
+            at.Au = 0;
+            at.Av = 0;
+            at.Hu = 0;
+            at.Hv = 0;
             at.MotionType = AircraftConstants.MotionInAirPortSurFace;
         % end
       end
@@ -73,18 +77,31 @@ classdef AircraftTrack
       function m = get.OZ(obj)         
          m = obj.OZ;
       end
-      function obj = set.U(obj,u)
-         obj.U = u;
+      function obj = set.Au(obj,au)
+         obj.Au = au;
       end
-      function m = get.U(obj)         
-         m = obj.U;
+      function m = get.Au(obj)         
+         m = obj.Au;
       end
-      function obj = set.V(obj,v)
-         obj.V = v;
+      function obj = set.Av(obj,av)
+         obj.Av = av;
       end
-      function m = get.V(obj)         
-         m = obj.V;
+      function m = get.Av(obj)         
+         m = obj.Av;
+      end      
+      function obj = set.Hu(obj,hu)
+         obj.Hu = hu;
       end
+      function m = get.Hu(obj)         
+         m = obj.Hu;
+      end
+      function obj = set.Hv(obj,hv)
+         obj.Hv = hv;
+      end
+      function m = get.Hv(obj)         
+         m = obj.Hv;
+      end
+
       function obj = set.MotionType(obj,motiontype)
          obj.MotionType = motiontype;
       end
@@ -101,11 +118,12 @@ classdef AircraftTrack
         
         [nheadp,nheadpidx] = sort([headp.dmin]); 
         
-
-        aircraftvvline = createLine([preat.U preat.V],[at.U at.V]);
-        
-        for i=1:5
-
+           
+        aircraftavline = createLine([at.Au at.Av],[preat.Au preat.Av]);
+        aircrafthvline = parallelLine(aircraftavline, [preat.Hu preat.Hv]);
+        for i=1:3
+            pg = headp(nheadpidx(i)).polygonxy;
+            [headpoint, edgeidx] = intersectLinePolyline(aircrafthvline, pg);
         end
 
         bsucceed = true;
