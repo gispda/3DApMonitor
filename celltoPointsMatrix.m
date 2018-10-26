@@ -6,7 +6,7 @@ function mPxy = celltoPointsMatrix(contour)
   
     for i=1:dim
 
-      mPxy(i,1)=contour{i}(1);
+      mPxy(i,1)=-contour{i}(1);
       mPxy(i,2)=contour{i}(2);
     end
     

@@ -112,6 +112,8 @@ classdef AircraftTrack
       %{ 
          輸入preat 前一個飛機航班軌跡點的AircraftTrack對象，
          計算出當前AircraftTrack對象的機頭坐標
+         需要將坐標系從圖像坐標系轉成正常坐標系，也就是說v值爲負。
+
 
       %}
       function bsucceed = calcHeadPos(at,preat,headp)
@@ -119,14 +121,33 @@ classdef AircraftTrack
         [nheadp,nheadpidx] = sort([headp.dmin]); 
         
            
-        aircraftavline = createLine([at.Au at.Av],[preat.Au preat.Av]);
-        aircrafthvline = parallelLine(aircraftavline, [preat.Hu preat.Hv]);
-        aircraftprehaline = createLine([preat.Au preat.Av],[preat.Hu preat.Hv]);
-        aircraftathaline = parallelLine(aircraftprehaline, [at.Hu at.Hv]);
+        aircraftavline = createLine([-at.Au at.Av],[-preat.Au preat.Av]);
+        aircrafthvline = parallelLine(aircraftavline,[-preat.Hu preat.Hv]);
+        aircraftprehaline = createLine([-preat.Au preat.Av],[-preat.Hu preat.Hv]);
+        aircraftathaline = parallelLine(aircraftprehaline, [-at.Au at.Av]);
         headpointl = intersectLines(aircraftathaline, aircrafthvline);
         for i=1:3
             pg = headp(nheadpidx(i)).polygonxy;
+            
             [headpoint, edgeidx] = intersectLinePolyline(aircrafthvline, pg);
+            
+            
+            if ~isempty(headpoint)
+                for j=1:size(headpoint,1)
+                  if norm(headpointl-headpoint)<40
+                     at.Hu = -headpoint(1,1);
+                     at.Hv = headpoint(1,2);
+                  else
+                     at.Hu = -headpointl(1,1);
+                     at.Hv = headpointl(1,2);
+                      
+                  end 
+                end
+            else
+               at.Hu = -headpointl(1,1);
+               at.Hv = -headpointl(1,2);
+                      
+            end 
         end
 
         bsucceed = true;
