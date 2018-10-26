@@ -103,7 +103,7 @@ for imgidx=100:999
     %if isempty(frame)
    %	stop = true;
      %else
-    %frame = cv.resize(frame,[1080,768], 'Interpolation','Cubic');
+    frame = cv.resize(frame,[1080,768], 'Interpolation','Cubic');
     frame_motion = cv.copyTo(frame);
 
     %计算前景掩码
@@ -218,9 +218,9 @@ for imgidx=100:999
       if bs
          aircrafttrack(frameidx)=at; 
          pxy = AircraftTrackToPolyLine(aircrafttrack,frameidx);
-         clr = [255 0 0];
+         clr = [0 0 255];
           drawing = cv.polylines(drawing, pxy, ...
-                         'Color',clr, 'Thickness',2, 'LineType',8);
+                         'Color',clr, 'Thickness',1, 'LineType',4);
       end
   end    
 
