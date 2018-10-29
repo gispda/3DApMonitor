@@ -59,6 +59,9 @@ classdef AircraftTrack
       function m = get.HeadZ(obj)         
          m = obj.HeadZ;
       end
+      function obj = set.HeadZ(obj,headz)         
+         obj.HeadZ = headz;
+      end      
       function obj = set.OX(obj,ox)
          obj.OX = ox;
       end
