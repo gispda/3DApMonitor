@@ -88,7 +88,7 @@ stop = false;
 frameidx = 1;
 posnum = size(wxy,1);
 
-
+groudimgxy = csvread('data/AirCraftMotion/ground.csv')
 
 
 aircrafttrack(1,posnum) = AircraftTrack();
@@ -147,7 +147,9 @@ for imgidx=100:999
       aircrafttrack(frameidx).Au = craftimgpos(:,1);
       aircrafttrack(frameidx).Av = craftimgpos(:,2);
     
-      
+      aircrafttrack(frameidx).Gu = groudimgxy(frameidx,1);
+      aircrafttrack(frameidx).Gv = groudimgxy(frameidx,2);
+    
             drawing = zeros([size(draw1) 3], 'uint8');
 
             clear headp;
@@ -217,10 +219,14 @@ for imgidx=100:999
   [bs,at] = aircrafttrack(frameidx).calcHeadPos(aircrafttrack(frameidx-1),headp);
       if bs
          aircrafttrack(frameidx)=at; 
-         pxy = AircraftTrackToPolyLine(aircrafttrack,frameidx);
-         clr = [255 0 0];
-          drawing = cv.polylines(drawing, pxy, ...
-                         'Color',clr, 'Thickness',2, 'LineType',8);
+         pxy = AircraftTrackToPolyLineCalc(aircrafttrack,frameidx);
+         gxy = AircraftTrackToPolyLineGround(aircrafttrack,frameidx);
+         cclr = [255 0 0];
+         gclr = [255 0 255];
+          %drawing = cv.polylines(drawing, pxy, ...
+           %              'Color',cclr, 'Thickness',2, 'LineType',8);
+          drawing = cv.polylines(drawing, gxy, ...
+                         'Color',gclr, 'Thickness',2, 'LineType',8);
       end
   end    
 
@@ -228,7 +234,10 @@ for imgidx=100:999
     imshow(drawing);   
     end % end tempidx ==0 
 end % end for imgidx = 100:1000
+ pltxy = AircraftTrackToPolyLineError(aircrafttrack,35);
+ % pltxy = [posImg(:,1)-eptImg1(:,1),posImg(:,2)-eptImg1(:,2)]
+%pltxy = [posImg(:,1)-eptImg(:,1),posImg(:,2)-eptImg(:,2)]
 
-  
+plot(pltxy(:,1),pltxy(:,2),'LineWidth',1)
   
 

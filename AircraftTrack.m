@@ -3,6 +3,7 @@ classdef AircraftTrack
       HeadX
       HeadY
       HeadZ
+
       Yaw
       Pitch
       Yoll
@@ -15,7 +16,9 @@ classdef AircraftTrack
       Au
       Av
       Hu
-      Hv     
+      Hv
+      Gu
+      Gv     
       MotionType
 
    end
@@ -40,6 +43,8 @@ classdef AircraftTrack
             at.Av = 0;
             at.Hu = 0;
             at.Hv = 0;
+            at.Gu = 0;
+            at.Gv = 0;
             at.MotionType = AircraftConstants.MotionInAirPortSurFace;
         % end
       end
@@ -104,7 +109,18 @@ classdef AircraftTrack
       function m = get.Hv(obj)         
          m = obj.Hv;
       end
-
+     function obj = set.Gu(obj,gu)
+         obj.Gu = gu;
+      end
+      function m = get.Gu(obj)         
+         m = obj.Gu;
+      end
+      function obj = set.Gv(obj,gv)
+         obj.Gv = gv;
+      end
+      function m = get.Gv(obj)         
+         m = obj.Gv;
+      end
       function obj = set.MotionType(obj,motiontype)
          obj.MotionType = motiontype;
       end
