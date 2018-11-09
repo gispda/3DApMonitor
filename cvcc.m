@@ -86,6 +86,8 @@ posCameraXYZ = [xc-x0,-(yc-y0),cameraPosHight-airportZeroHight]
  
  M = estimateCameraProjectionMatrix(posImg,posXYZ)
  
+ save ('motion.mat','M');
+
 %t = posCameraXYZ'
 [K,R,t] = estimate_KR_fromMT(M)
 %[K,R,t] = estimate_KRt_fromM(M)
